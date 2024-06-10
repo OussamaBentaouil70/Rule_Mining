@@ -3,7 +3,7 @@ import { useContext } from "react";
 import { UserContext } from "../../context/userContext";
 import { useEffect, useState } from "react";
 import Axios from "axios";
-import { Button, Box, IconButton } from "@mui/material";
+import { Button, Box, IconButton, Avatar } from "@mui/material";
 import Table from "@mui/material/Table";
 import TableBody from "@mui/material/TableBody";
 import TableCell from "@mui/material/TableCell";
@@ -16,6 +16,7 @@ import EditMemberModal from "../components/EditMemberModal";
 import DeleteIcon from "@mui/icons-material/Delete";
 import EditIcon from "@mui/icons-material/Edit";
 import toast from "react-hot-toast";
+import Sidebar from "../components/Sidebar";
 
 export default function Dashboard() {
   const [members, setMembers] = useState([]);
@@ -27,6 +28,7 @@ export default function Dashboard() {
     setSelectedMember(member);
     setOpenEditModal(true);
   };
+
   const fetchData = async () => {
     try {
       const response = await Axios.get("/api/get_members/", {
@@ -34,7 +36,7 @@ export default function Dashboard() {
           Authorization: `Bearer ${localStorage.getItem("token")}`, // Assuming the token is stored in localStorage
         },
       });
-      console.log(response.data);
+
       setMembers(response.data);
     } catch (error) {
       console.error("Error fetching data: ", error);
@@ -45,6 +47,7 @@ export default function Dashboard() {
   useEffect(() => {
     fetchData();
   }, []);
+
   const handleDelete = (member) => {
     if (window.confirm("Are you sure you want to delete this member?")) {
       const token = localStorage.getItem("token");
@@ -64,8 +67,18 @@ export default function Dashboard() {
     }
   };
 
+  const getRandomColor = () => {
+    const letters = "0123456789ABCDEF";
+    let color = "#";
+    for (let i = 0; i < 6; i++) {
+      color += letters[Math.floor(Math.random() * 16)];
+    }
+    return color;
+  };
+
   return (
-    <div className="">
+    <Box>
+      <Sidebar />
       <Box sx={{ bgcolor: "rgb(245, 245, 245)", p: 3, minHeight: "100vh" }}>
         <Box display="flex" justifyContent="flex-end" mb={2}>
           <Button
@@ -94,7 +107,12 @@ export default function Dashboard() {
               {members.map((member) => (
                 <TableRow key={member.id}>
                   <TableCell component="th" scope="row">
-                    {member.username}
+                    <Box display="flex" alignItems="center">
+                      <Avatar sx={{ bgcolor: getRandomColor(), mr: 2 }}>
+                        {member.username.charAt(0).toUpperCase()}
+                      </Avatar>
+                      {member.username}
+                    </Box>
                   </TableCell>
                   <TableCell align="left">{member.email}</TableCell>
                   <TableCell align="left">{member.role}</TableCell>
@@ -123,6 +141,6 @@ export default function Dashboard() {
           member={selectedMember}
         />
       </Box>
-    </div>
+    </Box>
   );
 }

@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { Box, Card, CardContent, Typography, Avatar } from "@mui/material";
 import Axios from "axios";
+import Sidebar from "../components/Sidebar";
 
 const Profile = () => {
   const [userInfo, setUserInfo] = useState(null);
@@ -35,6 +36,7 @@ const Profile = () => {
   };
   return (
     <div className="">
+      <Sidebar />
       <Box sx={{ bgcolor: "rgb(245, 245, 245)", p: 3, minHeight: "100vh" }}>
         <Card sx={{ maxWidth: 400, margin: "auto" }}>
           <CardContent>
