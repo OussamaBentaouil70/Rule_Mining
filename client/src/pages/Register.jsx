@@ -3,18 +3,15 @@ import { useState } from "react";
 import axios from "axios";
 import { toast } from "react-hot-toast";
 import { useNavigate } from "react-router-dom";
-import Avatar from "@mui/material/Avatar";
-import Button from "@mui/material/Button";
-import CssBaseline from "@mui/material/CssBaseline";
 import TextField from "@mui/material/TextField";
+import Button from "@mui/material/Button";
 import Link from "@mui/material/Link";
-import Grid from "@mui/material/Grid";
 import Box from "@mui/material/Box";
-import LockOutlinedIcon from "@mui/icons-material/LockOutlined";
+import Grid from "@mui/material/Grid";
 import Typography from "@mui/material/Typography";
 import Container from "@mui/material/Container";
 import { createTheme, ThemeProvider } from "@mui/material/styles";
-
+import logo from "../assets/logo2.png";
 const defaultTheme = createTheme();
 
 export default function Register() {
@@ -26,6 +23,7 @@ export default function Register() {
     role: "",
     fonction: "",
   });
+
   const registerUser = async (e) => {
     e.preventDefault();
     const { username, email, password, role, fonction } = data;
@@ -60,25 +58,42 @@ export default function Register() {
       }
     }
   };
+
   return (
-    <div className="">
+    <div
+      style={{
+        display: "flex",
+        justifyContent: "center",
+        alignItems: "center",
+        height: "100vh",
+        backgroundColor: "#f5f5f5",
+      }}
+    >
       <ThemeProvider theme={defaultTheme}>
-        <Container component="main" maxWidth="xs">
-          <CssBaseline />
+        <Container
+          component="main"
+          maxWidth="xs"
+          sx={{
+            background: "#fff",
+            padding: 3,
+            borderRadius: 2,
+            boxShadow: 3,
+          }}
+        >
           <Box
             sx={{
-              marginTop: 8,
               display: "flex",
               flexDirection: "column",
               alignItems: "center",
             }}
           >
-            <Avatar sx={{ m: 1, bgcolor: "secondary.main" }}>
-              <LockOutlinedIcon />
-            </Avatar>
-
+            <img
+              src={logo}
+              alt="Logo"
+              style={{ width: "150px", marginBottom: "20px" }}
+            />
             <Typography component="h1" variant="h5">
-              Sign up
+              Register
             </Typography>
             <Box
               component="form"
@@ -101,7 +116,6 @@ export default function Register() {
                     }
                   />
                 </Grid>
-
                 <Grid item xs={12}>
                   <TextField
                     required
@@ -162,14 +176,18 @@ export default function Register() {
                 type="submit"
                 fullWidth
                 variant="contained"
-                sx={{ mt: 3, mb: 2 }}
+                sx={{ mt: 3, mb: 2, backgroundColor: "#1976d2" }}
               >
                 Sign Up
               </Button>
-              <Grid container justifyContent="flex-end">
+              <Grid container justifyContent="center">
                 <Grid item>
-                  <Link href="/login" variant="body2">
-                    Already have an account? Sign in
+                  <Link
+                    href="/login"
+                    variant="body2"
+                    sx={{ color: "#1976d2", textAlign: "center" }}
+                  >
+                    Already have an account? Login
                   </Link>
                 </Grid>
               </Grid>

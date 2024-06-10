@@ -16,7 +16,7 @@ import Typography from "@mui/material/Typography";
 import { createTheme, ThemeProvider } from "@mui/material/styles";
 import { IconButton, InputAdornment } from "@mui/material";
 import { Visibility, VisibilityOff } from "@mui/icons-material";
-
+import logo from "../assets/logo2.png";
 const defaultTheme = createTheme();
 
 export default function Login() {
@@ -89,9 +89,11 @@ export default function Login() {
                 alignItems: "center",
               }}
             >
-              <Avatar sx={{ m: 1, bgcolor: "secondary.main" }}>
-                <LockOutlinedIcon />
-              </Avatar>
+              <img
+                src={logo}
+                alt="Logo"
+                style={{ width: "150px", marginBottom: "20px" }}
+              />
               <Typography component="h1" variant="h5">
                 Sign in
               </Typography>
