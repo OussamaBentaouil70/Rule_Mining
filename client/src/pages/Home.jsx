@@ -6,10 +6,13 @@ import FrameComponent2 from "../homeComponents/FrameComponent2";
 import FrameComponent1 from "../homeComponents/FrameComponent1";
 import FrameComponent from "../homeComponents/FrameComponent";
 import "./WelcomePage.css";
+import Navbar from "../components/Navbar";
 
 export default function Home() {
   return (
-    <div className="welcome-page">
+    <div>
+      <Navbar />
+        <div className="welcome-page">
       <main className="frame-parent">
         <FrameComponent4 />
         <section className="frame-group">
@@ -189,5 +192,7 @@ export default function Home() {
         </div>
       </footer>
     </div>
+    </div>
+  
   );
 }

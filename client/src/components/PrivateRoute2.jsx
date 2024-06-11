@@ -12,7 +12,7 @@ const PrivateRoute2 = ({ children }) => {
     return <Navigate to="/login" />;
   }
 
-  if (user.role !== "member") {
+  if (user.role !== "member"  ) {
     return <Navigate to="/login" />;
   }
 

@@ -1,7 +1,4 @@
-import React from "react";
-import { useContext } from "react";
-import { UserContext } from "../../context/userContext";
-import { useEffect, useState } from "react";
+import React, { useEffect, useState, useContext } from "react";
 import Axios from "axios";
 import { Button, Box, IconButton, Avatar } from "@mui/material";
 import Table from "@mui/material/Table";
@@ -17,6 +14,7 @@ import DeleteIcon from "@mui/icons-material/Delete";
 import EditIcon from "@mui/icons-material/Edit";
 import toast from "react-hot-toast";
 import Sidebar from "../components/Sidebar";
+import { UserContext } from "../../context/userContext";
 
 export default function Dashboard() {
   const [members, setMembers] = useState([]);
@@ -77,9 +75,9 @@ export default function Dashboard() {
   };
 
   return (
-    <Box>
+    <Box sx={{ display: "flex" }}>
       <Sidebar />
-      <Box sx={{ bgcolor: "rgb(245, 245, 245)", p: 3, minHeight: "100vh" }}>
+      <Box sx={{ flexGrow: 1, bgcolor: "rgb(245, 245, 245)", p: 3, minHeight: "100vh" }}>
         <Box display="flex" justifyContent="flex-end" mb={2}>
           <Button
             variant="contained"
@@ -108,9 +106,9 @@ export default function Dashboard() {
                 <TableRow key={member.id}>
                   <TableCell component="th" scope="row">
                     <Box display="flex" alignItems="center">
-                      <Avatar sx={{ bgcolor: getRandomColor(), mr: 2 }}>
-                        {member.username.charAt(0).toUpperCase()}
-                      </Avatar>
+                    <Avatar sx={{ bgcolor: member.avatar ? 'initial' : getRandomColor(), mr: 2 }}>
+  {member.avatar ? null : member.username.charAt(0).toUpperCase()}
+</Avatar>
                       {member.username}
                     </Box>
                   </TableCell>
@@ -134,7 +132,6 @@ export default function Dashboard() {
           open={openModal}
           handleClose={() => setOpenModal(false)}
         />
-        {/* Edit Member Modal */}
         <EditMemberModal
           open={openEditModal}
           handleClose={() => setOpenEditModal(false)}

@@ -49,7 +49,7 @@ export default function Navbar() {
   };
 
   const { user, logout } = React.useContext(UserContext);
-  console.log(user);
+
 
   return (
     <nav className="">

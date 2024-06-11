@@ -12,6 +12,7 @@ import Typography from "@mui/material/Typography";
 import Container from "@mui/material/Container";
 import { createTheme, ThemeProvider } from "@mui/material/styles";
 import logo from "../assets/logo2.png";
+import Navbar from "../components/Navbar";
 const defaultTheme = createTheme();
 
 export default function Register() {
@@ -60,7 +61,9 @@ export default function Register() {
   };
 
   return (
-    <div
+    <div>
+      <Navbar />
+       <div
       style={{
         display: "flex",
         justifyContent: "center",
@@ -196,5 +199,7 @@ export default function Register() {
         </Container>
       </ThemeProvider>
     </div>
+    </div>
+   
   );
 }

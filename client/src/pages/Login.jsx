@@ -17,6 +17,7 @@ import { createTheme, ThemeProvider } from "@mui/material/styles";
 import { IconButton, InputAdornment } from "@mui/material";
 import { Visibility, VisibilityOff } from "@mui/icons-material";
 import logo from "../assets/logo2.png";
+import Navbar from "../components/Navbar";
 const defaultTheme = createTheme();
 
 export default function Login() {
@@ -51,6 +52,7 @@ export default function Login() {
 
   return (
     <div className="">
+      <Navbar />
       <ThemeProvider theme={defaultTheme}>
         <Grid container component="main" sx={{ height: "100vh" }}>
           <CssBaseline />
