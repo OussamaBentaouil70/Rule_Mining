@@ -1,21 +1,31 @@
 import React, { useEffect, useState } from "react";
-import { Box, Button, TextField, Grid, Typography, Avatar, Paper } from "@mui/material";
+import {
+  Box,
+  Button,
+  TextField,
+  Grid,
+  Typography,
+  Avatar,
+  Paper,
+} from "@mui/material";
 import Axios from "axios";
-import { Image } from 'cloudinary-react'; // Import Cloudinary components
 import Sidebar from "../components/Sidebar";
+import toast from "react-hot-toast";
 
 const Profile = () => {
   const [imagePreview, setImagePreview] = useState(null);
-  const [imageURL, setImageURL] = useState('');
+  const [imageURL, setImageURL] = useState("");
 
   const [userInfo, setUserInfo] = useState({
-    username: '',
-    full_name: '',
-    role: '',
-    email: '',
-    phone_number: '',
-    address: '',
-    bio: ''
+    username: "",
+    full_name: "",
+    role: "",
+    email: "",
+    phone_number: "",
+    address: "",
+    fonction: "",
+    bio: "",
+    avatar: "",
   });
 
   const fetchUserInfo = async () => {
@@ -30,6 +40,7 @@ const Profile = () => {
         });
 
         setUserInfo(response.data);
+        setImageURL(response.data.avatar); // Set initial avatar URL
       } else {
         console.error("Token not found in localStorage");
       }
@@ -42,12 +53,12 @@ const Profile = () => {
     fetchUserInfo();
   }, []);
 
-  const handleChange = (event) => {
+  const handleChange = async (event) => {
     const { name, value } = event.target;
 
     if (name === "avatar") {
       const file = event.target.files[0];
-      
+
       // Display image preview
       if (file) {
         const reader = new FileReader();
@@ -57,20 +68,27 @@ const Profile = () => {
         reader.readAsDataURL(file);
 
         // Upload image to Cloudinary and get the URL
-        // Update 'cloud_name' with your Cloudinary cloud name
         const formData = new FormData();
-        formData.append('file', file);
-        formData.append('upload_preset', 'your_upload_preset');
-        
-        fetch('https://api.cloudinary.com/v1_1/cloud_name/image/upload', {
-          method: 'POST',
-          body: formData,
-        })
-        .then(response => response.json())
-        .then(data => {
-          setImageURL(data.secure_url);
-        })
-        .catch(error => console.error('Error uploading image to Cloudinary:', error));
+        formData.append("file", file);
+        formData.append("upload_preset", "zjpblyid");
+
+        try {
+          const response = await Axios.post(
+            "https://api.cloudinary.com/v1_1/dkez34lgd/image/upload",
+            formData,
+            {
+              headers: { "X-Requested-With": "XMLHttpRequest" },
+              withCredentials: false,
+            }
+          );
+          setImageURL(response.data.secure_url);
+          setUserInfo((prevUserInfo) => ({
+            ...prevUserInfo,
+            avatar: response.data.secure_url,
+          }));
+        } catch (error) {
+          console.error("Error uploading image to Cloudinary:", error);
+        }
       }
     } else {
       setUserInfo((prevUserInfo) => ({
@@ -82,22 +100,23 @@ const Profile = () => {
 
   const handleSubmit = async (event) => {
     event.preventDefault();
-  
+
     try {
       const token = localStorage.getItem("token");
-      
-      // Send image URL instead of the actual file data
+
       const jsonData = {
         ...userInfo,
-        avatar: imageURL,
+        avatar: imageURL, // Attach the uploaded image URL to the avatar field
       };
-
+      console.log(jsonData);
       await Axios.put("/api/update_profile/", jsonData, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
       });
-      alert("Profile updated successfully!");
+      toast.success("The profile is updated successfully!");
+      fetchUserInfo();
+      window.location.href = "/profile";
     } catch (error) {
       console.error("Error updating profile: ", error);
     }
@@ -123,15 +142,107 @@ const Profile = () => {
             <Grid container spacing={2}>
               <Grid item xs={12} md={8}>
                 <Grid container spacing={2}>
-                  {/* Your form fields */}
+                  <Grid item xs={12} md={6}>
+                    <TextField
+                      name="username"
+                      label="Username"
+                      value={userInfo.username}
+                      onChange={handleChange}
+                      fullWidth
+                    />
+                  </Grid>
+                  <Grid item xs={12} md={6}>
+                    <TextField
+                      name="full_name"
+                      label="Full Name"
+                      value={userInfo.full_name}
+                      onChange={handleChange}
+                      fullWidth
+                    />
+                  </Grid>
+                  <Grid item xs={12} md={6}>
+                    <TextField
+                      name="email"
+                      label="Email"
+                      value={userInfo.email}
+                      onChange={handleChange}
+                      fullWidth
+                    />
+                  </Grid>
+                  <Grid item xs={12} md={6}>
+                    <TextField
+                      name="phone_number"
+                      label="Phone Number"
+                      value={userInfo.phone_number}
+                      onChange={handleChange}
+                      fullWidth
+                    />
+                  </Grid>
+                  <Grid item xs={12} md={6}>
+                    <TextField
+                      name="address"
+                      label="Address"
+                      value={userInfo.address}
+                      onChange={handleChange}
+                      fullWidth
+                    />
+                  </Grid>
+                  <Grid item xs={12} md={6}>
+                    <TextField
+                      name="fonction"
+                      label="Fonction"
+                      value={userInfo.fonction}
+                      onChange={handleChange}
+                      fullWidth
+                    />
+                  </Grid>
+                  <Grid item xs={12}>
+                    <TextField
+                      name="bio"
+                      label="Bio"
+                      value={userInfo.bio}
+                      onChange={handleChange}
+                      fullWidth
+                      multiline
+                      rows={4}
+                    />
+                  </Grid>
                 </Grid>
               </Grid>
               <Grid item xs={12} md={4}>
-                <Box sx={{ display: "flex", flexDirection: "column", alignItems: "center" }}>
+                <Box
+                  sx={{
+                    display: "flex",
+                    flexDirection: "column",
+                    alignItems: "center",
+                  }}
+                >
                   <Typography variant="h6" gutterBottom>
                     Profile Picture
                   </Typography>
-                  {/* Avatar display and file input */}
+                  <Avatar
+                    src={imagePreview || userInfo.avatar}
+                    sx={{
+                      width: 100,
+                      height: 100,
+                      bgcolor: getRandomColor(),
+                      fontSize: 50,
+                    }}
+                  >
+                    {!imagePreview &&
+                      !userInfo.avatar &&
+                      userInfo.username.charAt(0).toUpperCase()}
+                  </Avatar>
+                  <Button variant="contained" component="label" sx={{ mt: 2 }}>
+                    Upload
+                    <input
+                      type="file"
+                      name="avatar"
+                      accept="image/*"
+                      hidden
+                      onChange={handleChange}
+                    />
+                  </Button>
                 </Box>
               </Grid>
             </Grid>

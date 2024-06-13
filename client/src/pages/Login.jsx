@@ -17,6 +17,7 @@ import { createTheme, ThemeProvider } from "@mui/material/styles";
 import { IconButton, InputAdornment } from "@mui/material";
 import { Visibility, VisibilityOff } from "@mui/icons-material";
 import logo from "../assets/logo2.png";
+import image1 from "../assets/rule_mining_pic1.jpg";
 import Navbar from "../components/Navbar";
 const defaultTheme = createTheme();
 
@@ -62,8 +63,7 @@ export default function Login() {
             sm={4}
             md={7}
             sx={{
-              backgroundImage:
-                "url(https://source.unsplash.com/random?wallpapers)",
+              backgroundImage: `url(${image1})`,
               backgroundRepeat: "no-repeat",
               backgroundColor: (t) =>
                 t.palette.mode === "light"
