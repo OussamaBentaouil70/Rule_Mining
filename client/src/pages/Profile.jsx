@@ -11,7 +11,7 @@ import {
 import Axios from "axios";
 import Sidebar from "../components/Sidebar";
 import toast from "react-hot-toast";
-
+import icon from "../assets/icon.png";
 const Profile = () => {
   const [imagePreview, setImagePreview] = useState(null);
   const [imageURL, setImageURL] = useState("");
@@ -130,8 +130,19 @@ const Profile = () => {
   return (
     <Box sx={{ display: "flex" }}>
       <Sidebar />
-      <Box sx={{ flexGrow: 1, p: 3, minHeight: "100vh" }}>
-        <Typography variant="h4" gutterBottom>
+      <Box
+        sx={{
+          flexGrow: 1,
+          p: 3,
+          minHeight: "100vh",
+          bgcolor: "rgb(245, 245, 245)",
+        }}
+      >
+        <Typography
+          variant="h4"
+          sx={{ display: "flex", alignItems: "center", marginBottom: "16px" }}
+        >
+          <Avatar src={icon} sx={{ marginRight: 1 }} />
           Profile
         </Typography>
         <Typography variant="subtitle1" gutterBottom>

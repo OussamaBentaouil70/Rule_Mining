@@ -1,19 +1,49 @@
 import React, { useEffect, useState } from "react";
 import Axios from "axios";
 import {
-  Table,
-  TableBody,
-  TableCell,
-  TableContainer,
-  TableHead,
-  TableRow,
-  Paper,
   Box,
+  List,
+  ListItem,
+  ListItemText,
+  Divider,
   TextareaAutosize,
+  Typography,
+  Button,
 } from "@mui/material";
+import Sidebar from "../components/Sidebar";
+import { styled } from "@mui/system";
+import Paper from "@mui/material/Paper";
+import toast from "react-hot-toast";
+const NavigationPanel = styled(Box)({
+  width: "25%",
+  borderRight: "1px solid #ccc",
+  padding: "16px",
+  boxSizing: "border-box",
+});
+
+const EditorPanel = styled(Box)({
+  width: "75%",
+  padding: "16px",
+  boxSizing: "border-box",
+});
+
+const RuleEditor = styled(TextareaAutosize)({
+  width: "100%",
+  height: "calc(100% - 48px)", // Subtract the height of the button
+  padding: "16px",
+  border: "1px solid #ccc",
+  borderRadius: "8px",
+  fontSize: "14px",
+  fontFamily: "monospace",
+  boxSizing: "border-box",
+  backgroundColor: "white",
+  color: "black",
+});
 
 export default function Rules() {
   const [rules, setRules] = useState([]);
+  const [selectedRule, setSelectedRule] = useState(null);
+  const [editorContent, setEditorContent] = useState("");
 
   useEffect(() => {
     const fetchData = async () => {
@@ -26,56 +56,130 @@ export default function Rules() {
         setRules(response.data);
       } catch (error) {
         console.error("Error fetching data: ", error);
-        // Handle errors here
+      }
+    };
+    const fetchData2 = async () => {
+      try {
+        const response = await Axios.get("/api/get_rules/", {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+          },
+        });
+        setRules(response.data);
+      } catch (error) {
+        console.error("Error fetching data: ", error);
       }
     };
 
-    fetchData();
+    // fetchData();
+    fetchData2();
   }, []);
 
+  const handleSave = async () => {
+    if (selectedRule) {
+      try {
+        await Axios.put(
+          `/api/edit_rule/${selectedRule._id}/`,
+          { description: editorContent },
+          {
+            headers: {
+              Authorization: `Bearer ${localStorage.getItem("token")}`,
+              "Content-Type": "application/json",
+            },
+          }
+        );
+        // Update the rules list with the new description
+        setRules((prevRules) =>
+          prevRules.map((rule) =>
+            rule._id === selectedRule._id
+              ? { ...rule, description: editorContent }
+              : rule
+          )
+        );
+        // Reset the selected rule with the updated description
+        setSelectedRule((prevSelectedRule) => ({
+          ...prevSelectedRule,
+          description: editorContent,
+        }));
+        toast.success("Rule updated successfully!");
+      } catch (error) {
+        console.error("Error saving data: ", error);
+      }
+    }
+  };
+
+  const handleRuleSelection = (rule) => {
+    setSelectedRule(rule);
+    setEditorContent(rule.description);
+  };
+
   return (
-    <div>
-      <Box sx={{ bgcolor: "rgb(245, 245, 245)", p: 3, minHeight: "100vh" }}>
-        <TableContainer
-          component={Paper}
-          sx={{ maxWidth: 1200, margin: "auto" }}
-        >
-          <Table aria-label="simple table">
-            <TableHead>
-              <TableRow>
-                <TableCell>Name</TableCell>
-                <TableCell>Description</TableCell>
-                <TableCell>Tag</TableCell>
-              </TableRow>
-            </TableHead>
-            <TableBody>
+    <Box sx={{ display: "flex", height: "100vh" }}>
+      <Sidebar />
+      <Box sx={{ display: "flex", flexGrow: 1, bgcolor: "rgb(245, 245, 245)" }}>
+        <NavigationPanel>
+          <Typography variant="h6" gutterBottom>
+            Explorer
+          </Typography>
+          <List>
+            <Paper
+              sx={{
+                bgcolor: "white",
+                width: "100%  ",
+                display: "inline-block",
+                marginBottom: "16px",
+              }}
+            >
               {rules.map((rule) => (
-                <TableRow key={rule._id}>
-                  <TableCell>{rule.name}</TableCell>
-                  <TableCell>
-                    <TextareaAutosize
-                      minRows={3}
-                      maxRows={6}
-                      style={{
-                        width: "100%",
-                        backgroundColor: "white",
-                        color: "black",
-                        padding: "8px",
-                        border: "1px solid #ccc",
-                      }}
-                      value={rule.description}
-                      readOnly
-                    />
-                  </TableCell>
-                  <TableCell>{rule.tag}</TableCell>
-                </TableRow>
+                <ListItem
+                  button
+                  key={rule._id}
+                  onClick={() => handleRuleSelection(rule)}
+                >
+                  <ListItemText primary={rule.name} />
+                </ListItem>
               ))}
-            </TableBody>
-          </Table>
-        </TableContainer>
-        {/* Edit Rule Modal */}
-        {/* Implement your Edit Rule Modal component here */}
+            </Paper>
+          </List>
+          <Divider />
+        </NavigationPanel>
+        <EditorPanel>
+          {selectedRule ? (
+            <>
+              <Paper
+                sx={{
+                  bgcolor: "white",
+                  width: "fit-content",
+                  display: "inline-block",
+                  marginBottom: "16px",
+                }}
+              >
+                <Typography variant="h6" gutterBottom>
+                  {selectedRule.name}
+                </Typography>
+              </Paper>
+
+              <RuleEditor
+                minRows={20}
+                value={editorContent}
+                onChange={(e) => setEditorContent(e.target.value)}
+              />
+              <Button
+                variant="contained"
+                color="primary"
+                sx={{ marginTop: "16px" }}
+                onClick={handleSave}
+              >
+                Save
+              </Button>
+            </>
+          ) : (
+            <Typography variant="h6" gutterBottom>
+              Select a rule to view its details
+            </Typography>
+          )}
+        </EditorPanel>
       </Box>
-    </div>
+    </Box>
   );
 }

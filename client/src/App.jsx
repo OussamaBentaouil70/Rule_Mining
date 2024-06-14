@@ -17,6 +17,7 @@ import PrivateRoute2 from "./components/PrivateRoute2";
 import Profile from "./pages/Profile";
 import ChatBot from "./pages/ChatBot";
 import PrivateRoute3 from "./components/PrivateRoute3";
+import Workspace from "./pages/Workspace";
 
 axios.defaults.baseURL = "http://127.0.0.1:8000";
 axios.defaults.withCredentials = true;
@@ -26,7 +27,6 @@ function App() {
 
   return (
     <UserContextProvider>
-  
       <Toaster position="bottom-right" toastOptions={{ duration: 2000 }} />
       <Routes>
         <Route path="/" element={<Home />} />
@@ -44,6 +44,14 @@ function App() {
             <PrivateRoute>
               <Dashboard />
             </PrivateRoute>
+          }
+        />
+        <Route
+          path="/workspaces"
+          element={
+            <PrivateRoute3>
+              <Workspace />
+            </PrivateRoute3>
           }
         />
         <Route

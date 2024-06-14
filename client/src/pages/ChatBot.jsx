@@ -4,22 +4,26 @@ import {
   Button,
   CircularProgress,
   List,
-  ListItemText,
   Paper,
   TextField,
   Typography,
+  InputAdornment,
+  IconButton,
 } from "@mui/material";
-import { styled } from "@mui/material/styles"; // Import styled function
+import { styled } from "@mui/material/styles";
 import axios from "axios";
 import React, { useState, useEffect } from "react";
+import SendIcon from "@mui/icons-material/Send";
+import AttachFileIcon from "@mui/icons-material/AttachFile";
+import AccountCircleIcon from "@mui/icons-material/AccountCircle";
 import icon from "../assets/icon.png";
+import Sidebar from "../components/Sidebar";
 
 const user = localStorage.getItem("user")
   ? JSON.parse(localStorage.getItem("user"))
   : null;
 
 const ChatContainer = styled(Box)({
-  // Create a styled component for ChatContainer
   display: "flex",
   flexDirection: "column",
   height: "100vh",
@@ -27,40 +31,39 @@ const ChatContainer = styled(Box)({
 });
 
 const ChatBox = styled(Box)({
-  // Create a styled component for ChatBox
-  width: "1000%",
-  height: "60%",
-  maxHeight: "100vh",
+  flexGrow: 1,
   overflowY: "auto",
   border: "1px solid #ccc",
   padding: "16px",
   borderRadius: "8px",
-  flexDirection: "column",
-
   marginBottom: "16px",
+  display: "flex",
+  flexDirection: "column",
+  justifyContent: "flex-end",
 });
 
 const InputContainer = styled(Box)({
-  // Create a styled component for InputContainer
   display: "flex",
   alignItems: "center",
 });
 
 const TextFieldStyled = styled(TextField)({
-  // Create a styled component for TextField
   flexGrow: 1,
-  marginRight: "8px",
 });
 
-const ButtonStyled = styled(Button)({
-  // Create a styled component for Button
-  height: "56px",
-});
+const MessageContainer = styled(Box)(({ theme, isUser }) => ({
+  display: "flex",
+  justifyContent: isUser ? "flex-end" : "flex-start",
+  marginBottom: "8px",
+}));
 
-const LoadingText = styled(ListItemText)({
-  // Create a styled component for LoadingText
-  fontStyle: "italic",
-});
+const MessagePaper = styled(Paper)(({ theme, isUser }) => ({
+  padding: "10px",
+  borderRadius: isUser ? "15px 15px 0 15px" : "15px 15px 15px 0",
+  backgroundColor: isUser ? "#DCF8C6" : "#FFF",
+  maxWidth: "60%",
+  wordBreak: "break-word",
+}));
 
 const getRandomColor = () => {
   const colors = ["#2196F3", "#4CAF50", "#FFC107", "#9C27B0", "#FF5722"];
@@ -79,7 +82,6 @@ export default function ChatBot() {
     }
   }, []);
 
-  // Load chat messages from localStorage
   const handleSend = async () => {
     if (input.trim() === "") return;
 
@@ -87,7 +89,6 @@ export default function ChatBot() {
     const updatedMessages = [...messages, newMessage];
     setMessages(updatedMessages);
 
-    // Save all messages to localStorage
     localStorage.setItem("chatMessages", JSON.stringify(updatedMessages));
 
     setInput("");
@@ -126,7 +127,6 @@ export default function ChatBot() {
       const botMessage = { user: "Bot", text: botResponseText };
       setMessages([...updatedMessages, botMessage]);
 
-      // Save all updated messages to localStorage
       localStorage.setItem(
         "chatMessages",
         JSON.stringify([...updatedMessages, botMessage])
@@ -139,7 +139,6 @@ export default function ChatBot() {
       };
       setMessages([...updatedMessages, errorMessage]);
 
-      // Save error message to localStorage
       localStorage.setItem(
         "chatMessages",
         JSON.stringify([...updatedMessages, errorMessage])
@@ -150,107 +149,92 @@ export default function ChatBot() {
   };
 
   return (
-    <Box sx={{ p: 5, minHeight: "10vh", maxWidth: "1200px", margin: "0 auto" }}>
-      <ChatContainer>
-        <Typography
-          variant="h4"
-          sx={{ display: "flex", alignItems: "center" }}
-          gutterBottom
-        >
-          <Avatar src={icon} sx={{ marginRight: 1 }} />{" "}
-          {/* Adjust the margin as needed */}
-          ChatBot
-        </Typography>
-
-        <ChatBox
-          sx={{ width: "90.5%", maxHeight: "1000vh", overflowY: "auto" }}
-        >
-          <List>
-            {messages.map((message, index) => (
-              <Box
-                key={index}
-                sx={{
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent:
-                    message.user === "User" ? "flex-end" : "flex-start",
-                  marginBottom: "8px",
-                }}
-              >
-                {message.user === "User" && user && (
-                  <Avatar
-                    sx={{
-                      bgcolor: getRandomColor(),
-                      fontSize: 25,
-                      margin: "auto 4px auto 0",
-                    }}
-                  >
-                    {user.username && user.username.charAt(0).toUpperCase()}
-                  </Avatar>
-                )}
-                {message.user === "Bot" && (
-                  <Avatar src={icon} sx={{ margin: "auto 4px auto 0" }} />
-                )}
-                <Paper
-                  sx={{
-                    padding: "8px",
-                    borderRadius: "12px",
-                    backgroundColor:
-                      message.user === "User" ? "#f0f0f0" : "#e0e0e0",
-                  }}
-                >
-                  <Typography
-                    variant="body1"
-                    dangerouslySetInnerHTML={{ __html: message.text }}
-                  ></Typography>
-                </Paper>
-              </Box>
-            ))}
-            {loading && (
-              <Box
-                sx={{
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "flex-start",
-                  marginBottom: "8px",
-                }}
-              >
-                <Avatar src={icon} />
-                <Paper
-                  sx={{
-                    padding: "8px",
-                    borderRadius: "12px",
-                    backgroundColor: "#f0f0f0",
-                    marginLeft: "8px", // Add margin for spacing between Avatar and Paper
-                  }}
-                >
-                  <Typography variant="body1">Bot is typing...</Typography>
-                  <CircularProgress size={24} />
-                </Paper>
-              </Box>
-            )}
-          </List>
-        </ChatBox>
-        <InputContainer>
-          <TextFieldStyled
-            label="Type your message"
-            variant="outlined"
-            value={input}
-            onChange={(e) => setInput(e.target.value)}
-            onKeyPress={(e) => {
-              if (e.key === "Enter") handleSend();
-            }}
-          />
-          <ButtonStyled
-            variant="contained"
-            color="primary"
-            onClick={handleSend}
-            disabled={loading}
+    <Box
+      sx={{ display: "flex", height: "100vh", bgcolor: "rgb(245, 245, 245)" }}
+    >
+      <Sidebar />
+      <Box
+        sx={{
+          flexGrow: 1,
+          display: "flex",
+          flexDirection: "column",
+          maxWidth: "1200px",
+          margin: "0 auto",
+        }}
+      >
+        <ChatContainer>
+          <Typography
+            variant="h4"
+            sx={{ display: "flex", alignItems: "center", marginBottom: "16px" }}
           >
-            Send
-          </ButtonStyled>
-        </InputContainer>
-      </ChatContainer>
+            <Avatar src={icon} sx={{ marginRight: 1 }} />
+            ChatBot
+          </Typography>
+
+          <ChatBox sx={{ bgcolor: "white" }}>
+            <List>
+              {messages.map((message, index) => (
+                <MessageContainer key={index} isUser={message.user === "User"}>
+                  {message.user === "User" && user && (
+                    <Avatar
+                      sx={{
+                        bgcolor: getRandomColor(),
+                        fontSize: 25,
+                        margin: "0 8px",
+                      }}
+                    >
+                      {user.username && user.username.charAt(0).toUpperCase()}
+                    </Avatar>
+                  )}
+                  {message.user === "Bot" && (
+                    <Avatar src={icon} sx={{ margin: "0 8px" }} />
+                  )}
+                  <MessagePaper isUser={message.user === "User"}>
+                    <Typography
+                      variant="body1"
+                      dangerouslySetInnerHTML={{ __html: message.text }}
+                    />
+                  </MessagePaper>
+                </MessageContainer>
+              ))}
+              {loading && (
+                <MessageContainer isUser={false}>
+                  <Avatar src={icon} sx={{ margin: "0 8px" }} />
+                  <MessagePaper>
+                    <Typography variant="body1">Bot is typing...</Typography>
+                    <CircularProgress size={24} />
+                  </MessagePaper>
+                </MessageContainer>
+              )}
+            </List>
+          </ChatBox>
+          <InputContainer sx={{ bgcolor: "white" }}>
+            <TextFieldStyled
+              placeholder="Type here..."
+              variant="outlined"
+              value={input}
+              onChange={(e) => setInput(e.target.value)}
+              onKeyPress={(e) => {
+                if (e.key === "Enter") handleSend();
+              }}
+              InputProps={{
+                startAdornment: (
+                  <InputAdornment position="start">
+                    <AccountCircleIcon sx={{ color: "#1976d3" }} />
+                  </InputAdornment>
+                ),
+                endAdornment: (
+                  <InputAdornment position="end">
+                    <IconButton onClick={handleSend}>
+                      <SendIcon sx={{ color: "#1976d3" }} />
+                    </IconButton>
+                  </InputAdornment>
+                ),
+              }}
+            />
+          </InputContainer>
+        </ChatContainer>
+      </Box>
     </Box>
   );
 }
