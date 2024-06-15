@@ -1,4 +1,3 @@
-import React from "react";
 import { Link } from "react-router-dom";
 import { UserContext } from "../../context/userContext";
 import AppBar from "@mui/material/AppBar";
@@ -10,7 +9,7 @@ import Menu from "@mui/material/Menu";
 
 import Container from "@mui/material/Container";
 import Avatar from "@mui/material/Avatar";
-
+import React, { useState, useEffect } from "react";
 import Tooltip from "@mui/material/Tooltip";
 import MenuItem from "@mui/material/MenuItem";
 
@@ -25,9 +24,9 @@ const settings = [
 ];
 
 export default function Navbar() {
-  const [anchorElNav, setAnchorElNav] = React.useState(null);
-  const [anchorElUser, setAnchorElUser] = React.useState(null);
-
+  const [anchorElNav, setAnchorElNav] = useState(null);
+  const [anchorElUser, setAnchorElUser] = useState(null);
+  const [userInfo, setUserInfo] = useState(null);
   const handleOpenNavMenu = (event) => {
     setAnchorElNav(event.currentTarget);
   };
@@ -48,8 +47,30 @@ export default function Navbar() {
     return colors[Math.floor(Math.random() * colors.length)];
   };
 
-  const { user, logout } = React.useContext(UserContext);
+  const fetchUserInfo = async () => {
+    try {
+      const token = localStorage.getItem("token");
 
+      if (token) {
+        const response = await axios.get("/api/profile/", {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+
+        setUserInfo(response.data);
+      } else {
+        console.error("Token not found in localStorage");
+      }
+    } catch (error) {
+      console.error("Error fetching user info: ", error);
+    }
+  };
+
+  useEffect(() => {
+    fetchUserInfo();
+  }, []);
+  const { user, logout } = React.useContext(UserContext);
 
   return (
     <nav className="">
@@ -98,7 +119,19 @@ export default function Navbar() {
                         margin: "auto",
                       }}
                     >
-                      {user && user.username.charAt(0).toUpperCase()}
+                      {user && userInfo && userInfo.avatar ? (
+                        <img
+                          src={userInfo.avatar}
+                          alt="User Avatar"
+                          style={{
+                            width: "100%",
+                            height: "100%",
+                            borderRadius: "50%",
+                          }}
+                        />
+                      ) : (
+                        user && user.username.charAt(0).toUpperCase()
+                      )}
                     </Avatar>
                   </IconButton>
                 </Tooltip>

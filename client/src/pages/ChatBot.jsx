@@ -1,7 +1,6 @@
 import {
   Avatar,
   Box,
-  Button,
   CircularProgress,
   List,
   Paper,
@@ -12,22 +11,18 @@ import {
 } from "@mui/material";
 import { styled } from "@mui/material/styles";
 import axios from "axios";
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import SendIcon from "@mui/icons-material/Send";
-import AttachFileIcon from "@mui/icons-material/AttachFile";
 import AccountCircleIcon from "@mui/icons-material/AccountCircle";
 import icon from "../assets/icon.png";
 import Sidebar from "../components/Sidebar";
-
-const user = localStorage.getItem("user")
-  ? JSON.parse(localStorage.getItem("user"))
-  : null;
 
 const ChatContainer = styled(Box)({
   display: "flex",
   flexDirection: "column",
   height: "100vh",
   padding: "16px",
+  overflow: "hidden",
 });
 
 const ChatBox = styled(Box)({
@@ -39,7 +34,7 @@ const ChatBox = styled(Box)({
   marginBottom: "16px",
   display: "flex",
   flexDirection: "column",
-  justifyContent: "flex-end",
+  // justifyContent: "flex-end",
 });
 
 const InputContainer = styled(Box)({
@@ -60,7 +55,7 @@ const MessageContainer = styled(Box)(({ theme, isUser }) => ({
 const MessagePaper = styled(Paper)(({ theme, isUser }) => ({
   padding: "10px",
   borderRadius: isUser ? "15px 15px 0 15px" : "15px 15px 15px 0",
-  backgroundColor: isUser ? "#DCF8C6" : "#FFF",
+  backgroundColor: isUser ? "#DCF8C6" : "#f4f4f4",
   maxWidth: "60%",
   wordBreak: "break-word",
 }));
@@ -74,13 +69,43 @@ export default function ChatBot() {
   const [messages, setMessages] = useState([]);
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
+  const [userInfo, setUserInfo] = useState(null);
+  const chatBoxRef = useRef(null);
+
+  const fetchUserInfo = async () => {
+    try {
+      const token = localStorage.getItem("token");
+
+      if (token) {
+        const response = await axios.get("/api/profile/", {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+
+        setUserInfo(response.data);
+      } else {
+        console.error("Token not found in localStorage");
+      }
+    } catch (error) {
+      console.error("Error fetching user info: ", error);
+    }
+  };
 
   useEffect(() => {
+    fetchUserInfo();
+
     const storedMessages = localStorage.getItem("chatMessages");
     if (storedMessages) {
       setMessages(JSON.parse(storedMessages));
     }
   }, []);
+
+  useEffect(() => {
+    if (chatBoxRef.current) {
+      chatBoxRef.current.scrollTop = chatBoxRef.current.scrollHeight;
+    }
+  }, [messages, loading]);
 
   const handleSend = async () => {
     if (input.trim() === "") return;
@@ -160,6 +185,7 @@ export default function ChatBot() {
           flexDirection: "column",
           maxWidth: "1200px",
           margin: "0 auto",
+          overflow: "hidden",
         }}
       >
         <ChatContainer>
@@ -171,19 +197,21 @@ export default function ChatBot() {
             ChatBot
           </Typography>
 
-          <ChatBox sx={{ bgcolor: "white" }}>
+          <ChatBox sx={{ bgcolor: "white" }} ref={chatBoxRef}>
             <List>
               {messages.map((message, index) => (
                 <MessageContainer key={index} isUser={message.user === "User"}>
-                  {message.user === "User" && user && (
+                  {message.user === "User" && userInfo && (
                     <Avatar
                       sx={{
                         bgcolor: getRandomColor(),
                         fontSize: 25,
                         margin: "0 8px",
                       }}
+                      src={userInfo.avatar || null}
                     >
-                      {user.username && user.username.charAt(0).toUpperCase()}
+                      {!userInfo.avatar &&
+                        userInfo.username.charAt(0).toUpperCase()}
                     </Avatar>
                   )}
                   {message.user === "Bot" && (
