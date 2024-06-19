@@ -108,7 +108,7 @@ const Profile = () => {
         ...userInfo,
         avatar: imageURL, // Attach the uploaded image URL to the avatar field
       };
-      console.log(jsonData);
+
       await Axios.put("/api/update_profile/", jsonData, {
         headers: {
           Authorization: `Bearer ${token}`,

@@ -35,6 +35,7 @@ export default function Dashboard() {
         },
       });
 
+      console.log("Members data:", response.data); // Add this line to inspect the data
       setMembers(response.data);
     } catch (error) {
       console.error("Error fetching data: ", error);
@@ -77,7 +78,14 @@ export default function Dashboard() {
   return (
     <Box sx={{ display: "flex" }}>
       <Sidebar />
-      <Box sx={{ flexGrow: 1, bgcolor: "rgb(245, 245, 245)", p: 3, minHeight: "100vh" }}>
+      <Box
+        sx={{
+          flexGrow: 1,
+          bgcolor: "rgb(245, 245, 245)",
+          p: 3,
+          minHeight: "100vh",
+        }}
+      >
         <Box display="flex" justifyContent="flex-end" mb={2}>
           <Button
             variant="contained"
@@ -106,9 +114,28 @@ export default function Dashboard() {
                 <TableRow key={member.id}>
                   <TableCell component="th" scope="row">
                     <Box display="flex" alignItems="center">
-                    <Avatar sx={{ bgcolor: member.avatar ? 'initial' : getRandomColor(), mr: 2 }}>
-  {member.avatar ? null : member.username.charAt(0).toUpperCase()}
-</Avatar>
+                      <Avatar
+                        sx={{
+                          bgcolor: member.avatar ? "initial" : getRandomColor(),
+                          mr: 2,
+                          width: 40, // Adjust the size as needed
+                          height: 40, // Adjust the size as needed
+                        }}
+                      >
+                        {member.avatar ? (
+                          <img
+                            src={member.avatar}
+                            alt={`${member.username}'s avatar`}
+                            style={{
+                              width: "100%",
+                              height: "100%",
+                              objectFit: "cover",
+                            }}
+                          />
+                        ) : (
+                          member.username.charAt(0).toUpperCase()
+                        )}
+                      </Avatar>
                       {member.username}
                     </Box>
                   </TableCell>

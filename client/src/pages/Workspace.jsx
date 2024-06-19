@@ -1,35 +1,46 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   Box,
   Button,
   Typography,
   Container,
   Paper,
-  Input,
   CircularProgress,
   Grid,
+  Input,
 } from "@mui/material";
 import UploadFileIcon from "@mui/icons-material/UploadFile";
 import Axios from "axios";
+import { Link } from "react-router-dom";
 import Sidebar from "../components/Sidebar";
+import toast from "react-hot-toast";
 
 const Workspace = () => {
   const [selectedFile, setSelectedFile] = useState(null);
   const [uploading, setUploading] = useState(false);
-  const [uploadSuccess, setUploadSuccess] = useState(false);
+  const [uploadedFiles, setUploadedFiles] = useState(
+    JSON.parse(localStorage.getItem("uploadedFiles")) || []
+  );
+
+  useEffect(() => {
+    localStorage.setItem("uploadedFiles", JSON.stringify(uploadedFiles));
+  }, [uploadedFiles]);
 
   const handleFileChange = (event) => {
-    setSelectedFile(event.target.files[0]);
+    const file = event.target.files[0];
+    setSelectedFile(file);
+    if (file) {
+      handleUpload(file);
+    }
   };
 
-  const handleUpload = async () => {
-    if (!selectedFile) return;
+  const handleUpload = async (file) => {
+    if (!file) return;
 
     const formData = new FormData();
-    formData.append("file", selectedFile);
+    formData.append("file", file);
 
     setUploading(true);
-    setUploadSuccess(false);
 
     try {
       await Axios.post("/rules/upload/", formData, {
@@ -38,9 +49,11 @@ const Workspace = () => {
           Authorization: `Bearer ${localStorage.getItem("token")}`,
         },
       });
-      setUploadSuccess(true);
+      setUploadedFiles((prevFiles) => [...prevFiles, file.name]);
+      toast.success("File uploaded successfully!");
     } catch (error) {
       console.error("Error uploading file:", error);
+      toast.error("Error uploading file");
     } finally {
       setUploading(false);
     }
@@ -62,6 +75,39 @@ const Workspace = () => {
             Workspaces
           </Typography>
           <Grid container spacing={3}>
+            {uploadedFiles.map((file, index) => (
+              <Grid item xs={12} sm={6} md={4} key={index}>
+                <Paper
+                  elevation={3}
+                  sx={{
+                    display: "flex",
+                    flexDirection: "column",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    height: 200,
+                    textAlign: "center",
+                    p: 2,
+                    borderStyle: "dashed",
+                    "&:hover": {
+                      backgroundColor: "rgba(0,0,0,0.1)",
+                      cursor: "pointer",
+                    },
+                  }}
+                >
+                  <Typography variant="h6" gutterBottom>
+                    {file}
+                  </Typography>
+                  <Button
+                    variant="contained"
+                    color="primary"
+                    component={Link}
+                    to={`/rules`}
+                  >
+                    Open
+                  </Button>
+                </Paper>
+              </Grid>
+            ))}
             <Grid item xs={12} sm={6} md={4}>
               <Paper
                 elevation={3}
@@ -92,30 +138,9 @@ const Workspace = () => {
                     Choose File
                   </Button>
                 </label>
+                {uploading && <CircularProgress sx={{ mt: 2 }} />}
               </Paper>
             </Grid>
-            {selectedFile && (
-              <Grid item xs={12}>
-                <Paper elevation={3} sx={{ p: 2 }}>
-                  <Typography variant="body1">{selectedFile.name}</Typography>
-                  <Box sx={{ mt: 2, textAlign: "center" }}>
-                    <Button
-                      variant="contained"
-                      color="primary"
-                      onClick={handleUpload}
-                      disabled={uploading}
-                    >
-                      {uploading ? <CircularProgress size={24} /> : "Upload"}
-                    </Button>
-                  </Box>
-                  {uploadSuccess && (
-                    <Typography variant="body1" color="success" sx={{ mt: 2 }}>
-                      File uploaded successfully!
-                    </Typography>
-                  )}
-                </Paper>
-              </Grid>
-            )}
           </Grid>
         </Container>
       </Box>
