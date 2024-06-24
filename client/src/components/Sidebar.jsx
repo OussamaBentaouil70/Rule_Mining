@@ -19,7 +19,7 @@ import logo from "../assets/logo2.png";
 import { UserContext } from "../../context/userContext";
 import HomeIcon from "@mui/icons-material/Home";
 const Sidebar = () => {
-  const { logout } = useContext(UserContext);
+  const { logout, user } = useContext(UserContext);
 
   return (
     <Drawer
@@ -56,12 +56,14 @@ const Sidebar = () => {
             </ListItemIcon>
             <ListItemText primary="Home" />
           </ListItem>
-          <ListItem button component={Link} to="/dashboard">
-            <ListItemIcon>
-              <PeopleIcon />
-            </ListItemIcon>
-            <ListItemText primary="Users" />
-          </ListItem>
+          {user.role === "owner" && (
+            <ListItem button component={Link} to="/dashboard">
+              <ListItemIcon>
+                <PeopleIcon />
+              </ListItemIcon>
+              <ListItemText primary="Users" />
+            </ListItem>
+          )}
           <ListItem button component={Link} to="/workspaces">
             <ListItemIcon>
               <BusinessIcon />

@@ -27,6 +27,7 @@ export function UserContextProvider({ children }) {
         localStorage.removeItem("user");
         localStorage.removeItem("token"); // Remove token from local storage
         localStorage.removeItem("chatMessages"); // Remove chat messages from local storage
+        localStorage.removeItem("uploadedFiles"); // Remove uploaded files from local storage
         navigate("/login"); // Redirect to the login page
       })
       .catch((error) => console.error("Logout failed", error));

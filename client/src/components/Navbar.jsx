@@ -24,6 +24,8 @@ const settings = [
 ];
 
 export default function Navbar() {
+  const { user, logout } = React.useContext(UserContext);
+
   const [anchorElNav, setAnchorElNav] = useState(null);
   const [anchorElUser, setAnchorElUser] = useState(null);
   const [userInfo, setUserInfo] = useState(null);
@@ -70,7 +72,6 @@ export default function Navbar() {
   useEffect(() => {
     fetchUserInfo();
   }, []);
-  const { user, logout } = React.useContext(UserContext);
 
   return (
     <nav className="">
@@ -119,9 +120,9 @@ export default function Navbar() {
                         margin: "auto",
                       }}
                     >
-                      {user && userInfo && userInfo.avatar ? (
+                      {user && user.avatar ? (
                         <img
-                          src={userInfo.avatar}
+                          src={user.avatar}
                           alt="User Avatar"
                           style={{
                             width: "100%",
