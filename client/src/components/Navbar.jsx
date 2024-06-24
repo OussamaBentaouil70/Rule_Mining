@@ -12,7 +12,7 @@ import Avatar from "@mui/material/Avatar";
 import React, { useState, useEffect } from "react";
 import Tooltip from "@mui/material/Tooltip";
 import MenuItem from "@mui/material/MenuItem";
-
+import axios from "axios";
 import logo from "../assets/logo.png";
 
 const settings = [
@@ -28,7 +28,7 @@ export default function Navbar() {
 
   const [anchorElNav, setAnchorElNav] = useState(null);
   const [anchorElUser, setAnchorElUser] = useState(null);
-  const [userInfo, setUserInfo] = useState(null);
+
   const handleOpenNavMenu = (event) => {
     setAnchorElNav(event.currentTarget);
   };
@@ -49,29 +49,7 @@ export default function Navbar() {
     return colors[Math.floor(Math.random() * colors.length)];
   };
 
-  const fetchUserInfo = async () => {
-    try {
-      const token = localStorage.getItem("token");
-
-      if (token) {
-        const response = await axios.get("/api/profile/", {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        });
-
-        setUserInfo(response.data);
-      } else {
-        console.error("Token not found in localStorage");
-      }
-    } catch (error) {
-      console.error("Error fetching user info: ", error);
-    }
-  };
-
-  useEffect(() => {
-    fetchUserInfo();
-  }, []);
+  useEffect(() => {}, []);
 
   return (
     <nav className="">
