@@ -80,7 +80,13 @@ const Sidebar = () => {
             <ListItemIcon>
               <ChatIcon />
             </ListItemIcon>
-            <ListItemText primary="ChatBot" />
+            <ListItemText primary="Chat Bot" />
+          </ListItem>
+          <ListItem button component={Link} to="/ruleflow">
+            <ListItemIcon>
+              <ChatIcon />
+            </ListItemIcon>
+            <ListItemText primary="Rule Flow" />
           </ListItem>
           <ListItem button component={Link} to="/profile">
             <ListItemIcon>

@@ -18,6 +18,7 @@ import Profile from "./pages/Profile";
 import ChatBot from "./pages/ChatBot";
 import PrivateRoute3 from "./components/PrivateRoute3";
 import Workspace from "./pages/Workspace";
+import RuleFlow from "./pages/RuleFlow";
 
 axios.defaults.baseURL = "http://127.0.0.1:8000";
 axios.defaults.withCredentials = true;
@@ -51,6 +52,14 @@ function App() {
           element={
             <PrivateRoute3>
               <Workspace />
+            </PrivateRoute3>
+          }
+        />
+        <Route
+          path="/ruleflow"
+          element={
+            <PrivateRoute3>
+              <RuleFlow />
             </PrivateRoute3>
           }
         />
