@@ -10,31 +10,58 @@ export function UserContextProvider({ children }) {
     const savedUser = localStorage.getItem("user");
     return savedUser ? JSON.parse(savedUser) : null;
   });
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     if (!user) {
+      setLoading(true);
       axios.get("/api/profile/").then(({ data }) => {
         setUser(data);
         localStorage.setItem("user", JSON.stringify(data));
-      });
+        setLoading(false);
+      }).catch(() => setLoading(false));
     }
-  }, []);
+
+    // Set up Axios interceptors
+    const requestInterceptor = axios.interceptors.request.use((config) => {
+      setLoading(true);
+      return config;
+    });
+
+    const responseInterceptor = axios.interceptors.response.use(
+      (response) => {
+        setLoading(false);
+        return response;
+      },
+      (error) => {
+        setLoading(false);
+        return Promise.reject(error);
+      }
+    );
+
+    // Cleanup interceptors on unmount
+    return () => {
+      axios.interceptors.request.eject(requestInterceptor);
+      axios.interceptors.response.eject(responseInterceptor);
+    };
+  }, [user]);
+
   const logout = () => {
-    setUser(null); // Reset user state
+    setUser(null);
     axios
-      .post("/api/logout/") // Optionally tell the server to clear the session/cookie
+      .post("/api/logout/")
       .then(() => {
         localStorage.removeItem("user");
-        localStorage.removeItem("token"); // Remove token from local storage
-        localStorage.removeItem("chatMessages"); // Remove chat messages from local storage
-        localStorage.removeItem("uploadedFiles"); // Remove uploaded files from local storage
-        navigate("/login"); // Redirect to the login page
+        localStorage.removeItem("token");
+        localStorage.removeItem("chatMessages");
+        localStorage.removeItem("uploadedFiles");
+        navigate("/login");
       })
       .catch((error) => console.error("Logout failed", error));
   };
 
   return (
-    <UserContext.Provider value={{ user, setUser, logout }}>
+    <UserContext.Provider value={{ user, setUser, loading, setLoading, logout }}>
       {children}
     </UserContext.Provider>
   );

@@ -1,14 +1,14 @@
+// App.jsx
 import "./App.css";
 import React, { useContext } from "react";
-import { Routes, Route } from "react-router-dom";
+import { Routes, Route, Navigate } from "react-router-dom";
 import Navbar from "./components/Navbar";
 import Home from "./pages/Home";
 import Register from "./pages/Register";
-import { UserContext } from "../context/userContext";
+import { UserContext, UserContextProvider } from "../context/userContext";
 import Login from "./pages/Login";
 import axios from "axios";
 import { Toaster } from "react-hot-toast";
-import { UserContextProvider } from "../context/userContext";
 import Dashboard from "./pages/Dashboard";
 import PrivateRoute from "./components/PrivateRoute";
 import TestNav from "./pages/TestNav";
@@ -19,15 +19,17 @@ import ChatBot from "./pages/ChatBot";
 import PrivateRoute3 from "./components/PrivateRoute3";
 import Workspace from "./pages/Workspace";
 import RuleFlow from "./pages/RuleFlow";
+import GlobalLoadingSpinner from "./components/GlobalLoadingSpinner";
 
 axios.defaults.baseURL = "http://127.0.0.1:8000";
 axios.defaults.withCredentials = true;
 
 function App() {
-  const { user } = useContext(UserContext);
+  const { user, loading } = useContext(UserContext);
 
   return (
     <UserContextProvider>
+      {loading && <GlobalLoadingSpinner />}
       <Toaster position="bottom-right" toastOptions={{ duration: 2000 }} />
       <Routes>
         <Route path="/" element={<Home />} />
@@ -92,4 +94,5 @@ function App() {
     </UserContextProvider>
   );
 }
+
 export default App;

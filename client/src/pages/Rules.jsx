@@ -141,6 +141,7 @@ export default function Rules() {
       toast.success("Rule added successfully!");
       setNewRule({ name: "", description: "" });
       setOpen(false);
+      window.location.reload();
     } catch (error) {
       console.error("Error adding rule: ", error);
       toast.error("Error adding rule");
